@@ -18,7 +18,7 @@ const router = createBrowserRouter([
           element: <Home />
       },
       {
-          path: "/:Category",
+          path: "/:category",
           element: <Category />
       },
       {
@@ -38,10 +38,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return 
-  <GifProvider>
-    <RouterProvider  router={router}/>
-  </GifProvider>
-}
+  return (
+    <GifProvider>
+      <RouterProvider router={router} />
+    </GifProvider>
+  );
+};
 
-export default App
+export default App;

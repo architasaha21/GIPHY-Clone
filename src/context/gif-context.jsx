@@ -1,20 +1,48 @@
-import { createContext } from "react"
-import { GiphyFetch } from "@giphy/js-fetch-api"
-/*eslint-disable react/prop-types*/
+/* eslint-disable react/prop-types */
 
-const GifContext = createContext()
+import {GiphyFetch} from "@giphy/js-fetch-api";
+import {createContext, useContext, useEffect, useState} from "react";
 
-const GifProvider = ({ children }) => {
+const GifContext = createContext();
 
-  const [gifs,setGifs] = useState([])
-  const [favorites, setFavorites] = useState([])
-  const [filter, setFilter] = useState("gifs")
-  
-  const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_API_KEY)
+const GifProvider = ({children}) => {
+  const [gifs, setGifs] = useState([]);
+  const [filter, setFilter] = useState("gifs");
+  const [favorites, setFavorites] = useState([]);
 
-    return <GifContext.Provider value={{gf, gifs, setGifs, filter, setFilter, favorites}}>{children}</GifContext.Provider>
-}
+  const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_API_KEY);
+
+  useEffect(() => {
+    const favorites = JSON.parse(localStorage.getItem("favoriteGIFs")) || [];
+    setFavorites(favorites);
+  }, []);
+
+  const addToFavorites = (id) => {
+    if (favorites.includes(id)) {
+      // If the item is already in favorites, we remove it
+      const updatedFavorites = favorites.filter((itemId) => itemId !== id);
+      localStorage.setItem("favoriteGIFs", JSON.stringify(updatedFavorites));
+      setFavorites(updatedFavorites);
+    } else {
+      // If the item is not in favorites, we add it
+      const updatedFavorites = [...favorites];
+      updatedFavorites.push(id);
+      localStorage.setItem("favoriteGIFs", JSON.stringify(updatedFavorites));
+      setFavorites(updatedFavorites);
+    }
+  };
+
+  return (
+    <GifContext.Provider
+      value={{gf, gifs, setGifs, addToFavorites, filter, setFilter, favorites}}
+    >
+      {children}
+    </GifContext.Provider>
+  );
+};
+
 export const GifState = () => {
-  return useContext(GifContext)
-}
-export default GifProvider
+  return useContext(GifContext);
+};
+
+export default GifProvider;
